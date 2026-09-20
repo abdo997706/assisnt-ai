@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>المساعد الذكي</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- شاشة تسجيل الدخول -->
+<div id="auth-screen" class="screen">
+  <div class="auth-split">
+    <div class="auth-brand">
+      <div class="brand-logo">🤖</div>
+      <h1>المساعد الذكي</h1>
+      <p>شات ذكي، رفع ملفات، تحليل صور، وتعديل صور وفيديو — كل حاجة في مكان واحد.</p>
+    </div>
+
+    <div class="auth-box">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="login">دخول</button>
+        <button class="tab-btn" data-tab="signup">حساب جديد</button>
+        <button class="tab-btn" data-tab="forgot">نسيت الباسورد</button>
+      </div>
+
+      <div id="login-tab" class="tab-content active">
+        <input type="text" id="login-username" placeholder="اسم المستخدم">
+        <input type="password" id="login-password" placeholder="كلمة المرور">
+        <button class="primary-btn" onclick="login()">دخول 🚀</button>
+        <p id="login-error" class="error-msg"></p>
+      </div>
+
+      <div id="signup-tab" class="tab-content">
+        <input type="text" id="signup-username" placeholder="اسم المستخدم">
+        <input type="password" id="signup-password" placeholder="كلمة المرور">
+        <input type="text" id="signup-question" placeholder="سؤال أمان (لو نسيت الباسورد)">
+        <input type="text" id="signup-answer" placeholder="إجابة سؤال الأمان">
+        <button class="primary-btn" onclick="signup()">إنشاء حساب 💾</button>
+        <p id="signup-error" class="error-msg"></p>
+      </div>
+
+      <div id="forgot-tab" class="tab-content">
+        <input type="text" id="forgot-username" placeholder="اسم المستخدم">
+        <button class="secondary-btn" onclick="fetchSecurityQuestion()">دور على سؤال الأمان</button>
+        <p id="forgot-question" class="question-text"></p>
+        <input type="text" id="forgot-answer" placeholder="إجابتك" class="hidden-field">
+        <input type="password" id="forgot-newpass" placeholder="كلمة المرور الجديدة" class="hidden-field">
+        <button class="primary-btn hidden-field" id="forgot-submit-btn" onclick="resetPassword()">إعادة تعيين كلمة المرور 🔄</button>
+        <p id="forgot-error" class="error-msg"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- شاشة القفل (انتهاء الوقت المتاح) -->
+<div id="lock-screen" class="screen hidden">
+  <div class="auth-split">
+    <div class="auth-brand lock-brand">
+      <div class="brand-logo">⏳</div>
+      <h1>انتهت فترة الاستخدام</h1>
+    </div>
+    <div class="auth-box">
+      <p id="lock-message" class="lock-message"></p>
+      <input type="text" id="vip-code-input" placeholder="اكتب كود الساعات هنا">
+      <button class="primary-btn" onclick="redeemCode()">✅ تفعيل الكود</button>
+      <p id="lock-error" class="error-msg"></p>
+    </div>
+  </div>
+</div>
+
+<!-- شاشة الشات -->
+<div id="chat-screen" class="screen hidden">
+  <div class="sidebar">
+    <h2>💬 الشاتات</h2>
+    <p id="remaining-time" class="remaining-time-badge"></p>
+    <input type="text" id="new-chat-name" placeholder="اسم شات جديد...">
+    <button class="secondary-btn" onclick="createNewChat()">➕ شات جديد</button>
+    <div id="chat-list"></div>
+    <button class="logout-btn" onclick="logout()">🚪 خروج</button>
+  </div>
+
+  <div class="main-chat">
+    <div id="messages"></div>
+
+    <div id="attachment-preview" class="attachment-preview hidden"></div>
+
+    <div class="input-bar">
+      <div class="plus-wrapper">
+        <button id="plus-btn" onclick="togglePlusMenu()">➕</button>
+        <div id="plus-menu" class="plus-menu hidden">
+          <label class="plus-item">
+            📎 إضافة ملفات أو صور
+            <input type="file" id="file-input" style="display:none" onchange="handleFileUpload(event)">
+          </label>
+          <div class="plus-item" onclick="openModal('image-editor-modal')">🖼️ تعديل الصور</div>
+          <div class="plus-item" onclick="openModal('video-editor-modal')">🎬 تعديل الفيديو</div>
+        </div>
+      </div>
+
+      <input type="text" id="message-input" placeholder="تحدث معي..." onkeypress="if(event.key==='Enter') sendMessage()">
+      <button id="send-btn" onclick="sendMessage()">⬆️</button>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة تعديل الصور -->
+<div id="image-editor-modal" class="modal hidden">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('image-editor-modal')">✕</button>
+    <h2>🖼️ تعديل الصور</h2>
+    <input type="file" id="edit-image-file" accept="image/*">
+    <img id="edit-image-preview" style="max-width:100%; display:none; border-radius:8px;">
+    <select id="edit-image-operation" onchange="updateImageEditorFields()">
+      <option value="resize">تصغير/تكبير</option>
+      <option value="crop">قص</option>
+      <option value="rotate">تدوير</option>
+      <option value="grayscale">أبيض وأسود</option>
+      <option value="brightness">تفتيح/تعتيم</option>
+      <option value="flip">قلب</option>
+    </select>
+    <div id="image-editor-fields"></div>
+    <button class="primary-btn" onclick="applyImageEdit()">تطبيق</button>
+    <div id="image-editor-result"></div>
+  </div>
+</div>
+
+<!-- نافذة تعديل الفيديو -->
+<div id="video-editor-modal" class="modal hidden">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('video-editor-modal')">✕</button>
+    <h2>🎬 تعديل الفيديو</h2>
+    <input type="file" id="edit-video-file" accept="video/*">
+    <select id="edit-video-operation" onchange="updateVideoEditorFields()">
+      <option value="trim">قص جزء</option>
+      <option value="extract_audio">استخراج الصوت</option>
+      <option value="resize">تغيير الدقة</option>
+    </select>
+    <div id="video-editor-fields"></div>
+    <button class="primary-btn" onclick="applyVideoEdit()">تطبيق</button>
+    <div id="video-editor-result"></div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

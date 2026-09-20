@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+google-genai
+openai
+Pillow
+pypdf
+python-docx
+pandas
+openpyxl
+fpdf2
+python-pptx
+moviepy
+imageio-ffmpeg
