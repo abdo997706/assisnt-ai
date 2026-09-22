@@ -1,11 +1,9 @@
 import os
 import random
 import time
-import json
 import google.generativeai as genai
 import requests
 
-# 1. الدالة المطورة لـ Gemini و Grok بنظام التدوير والاحتياط
 def generate_gemini_response(user_message, chat_history=None, system_prompt=None, model="gemini-1.5-flash", image=None):
     keys = [
         os.environ.get("GEMINI_API_KEY"),
@@ -51,7 +49,6 @@ def generate_gemini_response(user_message, chat_history=None, system_prompt=None
 
     return "السيرفرات مشغولة حالياً بالكامل، يرجى إعادة إرسال الرسالة."
 
-# 2. الدالة الاحتياطية المفقودة لقراءة وتحليل محتوى الملفات المرفوعة
 def process_file_content(file_path, file_extension):
     try:
         if file_extension == '.txt':
@@ -71,4 +68,3 @@ def process_file_content(file_path, file_extension):
     except Exception as e:
         return f"خطأ أثناء قراءة الملف: {str(e)}"
     return "امتداد ملف غير مدعوم."
- يرجى إرسال الرسالة مرة أخرى بعد لحظات."
