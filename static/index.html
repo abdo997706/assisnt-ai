@@ -6,7 +6,50 @@
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+<!-- زر تحميل التطبيق الاحترافي للأندرويد والكمبيوتر -->
+<button id="pwa-install-btn" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: #8a2be2; color: white; border: none; padding: 12px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+    📲 تحميل التطبيق
+</button>
 
+<script>
+// 1. تسجيل الـ Service Worker (إجباري للأندرويد لكي يظهر الزر)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service Worker Registered'))
+            .catch(err => console.log('Service Worker Failed', err));
+    });
+}
+
+let deferredPrompt;
+const installBtn = document.getElementById('pwa-install-btn');
+
+// 2. التقاط حدث التثبيت وإظهار الزر
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'flex'; // إظهار الزر فوراً على الأندرويد والكمبيوتر
+});
+
+// 3. برمجة زر التحميل عند الضغط عليه
+installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User installed the app');
+        }
+        deferredPrompt = null;
+        installBtn.style.display = 'none';
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    deferredPrompt = null;
+});
+</script>
+  
 <!-- شاشة تسجيل الدخول -->
 <div id="auth-screen" class="screen">
   <div class="auth-split">
