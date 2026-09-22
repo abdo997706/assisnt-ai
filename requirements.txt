@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 python-multipart
-google-genai
+google-generativeai
 openai
 Pillow
 pypdf
@@ -12,3 +12,4 @@ fpdf2
 python-pptx
 moviepy
 imageio-ffmpeg
+requests
