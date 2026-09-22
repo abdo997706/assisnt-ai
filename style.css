@@ -1,0 +1,138 @@
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+
+body { background: #f5f5f7; color: #1e1e2f; height: 100vh; overflow: hidden; }
+
+.screen { height: 100vh; width: 100%; }
+.hidden { display: none !important; }
+
+/* ---------- شاشة الدخول ---------- */
+#auth-screen, #lock-screen {
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+}
+.auth-split {
+  display: flex; width: 800px; max-width: 92vw; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.auth-brand {
+  flex: 1; background: linear-gradient(160deg, #4f46e5, #9333ea);
+  color: #fff; padding: 40px; display: flex; flex-direction: column; justify-content: center; gap: 14px;
+}
+.auth-brand.lock-brand { background: linear-gradient(160deg, #b45309, #dc2626); }
+.brand-logo {
+  width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center; font-size: 30px;
+}
+.auth-brand h1 { font-size: 24px; }
+.auth-brand p { font-size: 14px; opacity: 0.85; line-height: 1.6; }
+
+.auth-box { flex: 1; background: #fff; color: #222; padding: 32px; display: flex; flex-direction: column; gap: 10px; }
+.tabs { display: flex; margin-bottom: 12px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; }
+.tab-btn { flex: 1; padding: 10px 4px; border: none; background: #f3f3f3; cursor: pointer; font-weight: bold; font-size: 12px; }
+.tab-btn.active { background: #6366f1; color: #fff; }
+.tab-content { display: none; flex-direction: column; gap: 10px; }
+.tab-content.active { display: flex; }
+.auth-box input { padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; background: #fff; color: #222; }
+.primary-btn {
+  background: #6366f1; color: #fff; border: none; padding: 12px; border-radius: 8px;
+  font-weight: bold; cursor: pointer; font-size: 15px;
+}
+.primary-btn:hover { background: #4f46e5; }
+.error-msg { color: #dc2626; font-size: 13px; text-align: center; min-height: 18px; }
+.question-text { font-size: 14px; color: #4f46e5; font-weight: bold; min-height: 18px; }
+.hidden-field { display: none; }
+.lock-message { font-size: 14px; line-height: 1.6; color: #444; }
+.remaining-time-badge { font-size: 12px; background: #ececf3; color: #333; padding: 6px 10px; border-radius: 8px; text-align: center; }
+
+/* ---------- شاشة الشات ---------- */
+#chat-screen { display: flex; height: 100vh; }
+.sidebar {
+  width: 260px; background: #ffffff; padding: 16px; display: flex; flex-direction: column; gap: 10px;
+  border-left: 1px solid #e5e5ea;
+}
+.sidebar h2 { font-size: 16px; margin-bottom: 8px; color: #1e1e2f; }
+.sidebar input { padding: 10px; border-radius: 8px; border: 1px solid #ddd; background: #f7f7fa; color: #1e1e2f; }
+.secondary-btn { background: #ececf3; color: #333; border: none; padding: 10px; border-radius: 8px; cursor: pointer; }
+.secondary-btn:hover { background: #e0e0ea; }
+#chat-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.chat-list-item {
+  padding: 10px; border-radius: 8px; cursor: pointer; background: #f7f7fa; font-size: 14px; color: #1e1e2f;
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+}
+.chat-list-item:hover { background: #ececf3; }
+.chat-list-item.active { background: #6366f1; color: #fff; }
+.chat-name-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.chat-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s ease; }
+.chat-list-item:hover .chat-actions { opacity: 1; }
+.chat-action-btn { background: transparent; border: none; cursor: pointer; font-size: 13px; padding: 2px 4px; border-radius: 4px; }
+.chat-action-btn:hover { background: rgba(0,0,0,0.08); }
+.logout-btn { background: #fde2e2; color: #b42323; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+.main-chat { flex: 1; display: flex; flex-direction: column; background: #f5f5f7; }
+#messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.msg-row { display: flex; gap: 10px; max-width: 70%; }
+.msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
+.msg-row.assistant { align-self: flex-start; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.msg-row.user .avatar { background: linear-gradient(135deg, #10b981, #06b6d4); }
+.msg-row.assistant .avatar { background: linear-gradient(135deg, #6366f1, #a855f7); }
+.bubble { padding: 12px 16px; border-radius: 14px; line-height: 1.6; font-size: 15px; white-space: pre-wrap; }
+.msg-row.user .bubble { background: #6366f1; color: #fff; border-bottom-right-radius: 4px; }
+.msg-row.assistant .bubble { background: #ffffff; color: #1e1e2f; border: 1px solid #e5e5ea; border-bottom-left-radius: 4px; }
+.message-image { max-width: 220px; border-radius: 10px; display: block; margin-bottom: 6px; }
+.thinking { font-size: 13px; opacity: 0.7; font-style: italic; }
+
+/* ---------- شريط الإدخال ---------- */
+.input-bar { display: flex; align-items: center; gap: 10px; padding: 16px 24px; border-top: 1px solid #e5e5ea; background: #ffffff; }
+.plus-wrapper { position: relative; }
+#plus-btn {
+  width: 42px; height: 42px; border-radius: 50%; border: none; background: #ececf3; color: #333;
+  font-size: 20px; cursor: pointer; transition: transform 0.2s ease, background 0.2s ease;
+}
+#plus-btn:hover { background: #e0e0ea; }
+#plus-btn.open { transform: rotate(45deg); background: #6366f1; color: #fff; }
+.plus-menu {
+  position: absolute; bottom: 52px; right: 0; background: #ffffff; border: 1px solid #e5e5ea;
+  border-radius: 12px; padding: 8px; width: 220px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.plus-item { padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; display: block; color: #1e1e2f; }
+.plus-item:hover { background: #f3f3fa; }
+#message-input { flex: 1; padding: 12px 16px; border-radius: 24px; border: 1px solid #ddd; background: #f7f7fa; color: #1e1e2f; font-size: 15px; }
+#send-btn { width: 42px; height: 42px; border-radius: 50%; border: none; background: #6366f1; color: #fff; font-size: 18px; cursor: pointer; }
+#send-btn:hover { background: #4f46e5; }
+
+/* ---------- معاينة المرفق ---------- */
+.attachment-preview { display: flex; align-items: center; gap: 10px; padding: 8px 24px; background: #ffffff; border-top: 1px solid #e5e5ea; }
+.attachment-preview.hidden { display: none; }
+.preview-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 10px; border: 1px solid #ddd; }
+.preview-file-chip { display: flex; align-items: center; gap: 8px; background: #ececf3; color: #333; padding: 8px 12px; border-radius: 10px; font-size: 13px; }
+.preview-remove-btn { background: #dc2626; color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 12px; line-height: 1; }
+
+/* ---------- نوافذ تعديل الصور والفيديو (Modal) ---------- */
+.modal {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+.modal.hidden { display: none; }
+.modal-content {
+  background: #fff; border-radius: 16px; padding: 24px; width: 420px; max-width: 92vw; max-height: 85vh;
+  overflow-y: auto; position: relative; display: flex; flex-direction: column; gap: 10px;
+}
+.modal-close {
+  position: absolute; top: 12px; left: 12px; background: #ececf3; border: none; border-radius: 50%;
+  width: 28px; height: 28px; cursor: pointer; font-size: 13px;
+}
+.modal-content h2 { margin-bottom: 6px; }
+.modal-content select, .modal-content input[type="file"], .modal-content input[type="number"] {
+  padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; width: 100%;
+}
+.editor-field-row { display: flex; gap: 8px; }
+.editor-field-row input { flex: 1; }
+.editor-result-media { max-width: 100%; border-radius: 8px; margin-top: 8px; display: block; }
+.editor-download-link {
+  display: block; text-align: center; margin-top: 8px; text-decoration: none; padding: 10px;
+  background: #ececf3; color: #333; border-radius: 8px; font-weight: bold;
+}
