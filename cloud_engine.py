@@ -1,44 +1,37 @@
 import os
 import random
 import time
+import json
 import google.generativeai as genai
 import requests
 
+# 1. الدالة المطورة لـ Gemini و Grok بنظام التدوير والاحتياط
 def generate_gemini_response(user_message, chat_history=None, system_prompt=None, model="gemini-1.5-flash", image=None):
-    # 1. جمع كل مفاتيح جيميناي الثلاثة التي أضفناها في رايلواي داخل قائمة
     keys = [
         os.environ.get("GEMINI_API_KEY"),
         os.environ.get("GEMINI_API_KEY_2"),
         os.environ.get("GEMINI_API_KEY_3")
     ]
-    # تصفية القائمة للتأكد من استبعاد أي مفتاح فارغ
     valid_keys = [k for k in keys if k]
     
-    # 2. نظام التدوير العشوائي وإعادة المحاولة في حال وجود ضغط 503
     if valid_keys:
         for attempt in range(len(valid_keys)):
             try:
                 selected_key = random.choice(valid_keys)
                 genai.configure(api_key=selected_key)
-                
                 gemini_model = genai.GenerativeModel(model)
                 
-                # إرسال الرسالة لجوجل
-                if chat_history:
-                    chat = gemini_model.start_chat(history=[])
-                    response = chat.send_message(user_message)
+                if image:
+                    response = gemini_model.generate_content([user_message, image])
                 else:
                     response = gemini_model.generate_content(user_message)
-                
                 return response.text
             except Exception as e:
-                # إذا واجه هذا المفتاح ضغط 503، ينتظر ثانية ويحاول بمفتاح آخر عشوائي
                 if "503" in str(e) or "UNAVAILABLE" in str(e):
                     time.sleep(1)
                     continue
                 break
 
-    # 3. نظام الاحتياط التلقائي (Fallback) - التحويل لجروك فوراً لو انهارت خوادم جوجل تماماً
     grok_key = os.environ.get("GROK_API_KEY")
     if grok_key:
         try:
@@ -56,4 +49,26 @@ def generate_gemini_response(user_message, chat_history=None, system_prompt=None
         except:
             pass
 
-    return "السيرفرات مشغولة حالياً بالكامل، يرجى إرسال الرسالة مرة أخرى بعد لحظات."
+    return "السيرفرات مشغولة حالياً بالكامل، يرجى إعادة إرسال الرسالة."
+
+# 2. الدالة الاحتياطية المفقودة لقراءة وتحليل محتوى الملفات المرفوعة
+def process_file_content(file_path, file_extension):
+    try:
+        if file_extension == '.txt':
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        elif file_extension == '.pdf':
+            import pypdf
+            reader = pypdf.PdfReader(file_path)
+            text = ""
+            for page in reader.pages:
+                text += page.extract_text() or ""
+            return text
+        elif file_extension in ['.docx', '.doc']:
+            import docx
+            doc = docx.Document(file_path)
+            return "\n".join([p.text for p in doc.paragraphs])
+    except Exception as e:
+        return f"خطأ أثناء قراءة الملف: {str(e)}"
+    return "امتداد ملف غير مدعوم."
+ يرجى إرسال الرسالة مرة أخرى بعد لحظات."
