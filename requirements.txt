@@ -13,3 +13,6 @@ python-pptx
 moviepy
 imageio-ffmpeg
 requests
+pymysql
+cryptography
+pypdf
