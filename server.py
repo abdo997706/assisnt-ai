@@ -9,7 +9,7 @@ import io
 import json
 import time
 import secrets
-from fastapi import FastAPI, Request, UploadFile, File, Form, Security
+from fastapi import FastAPI, Request, UploadFile, File, Form, Security, Depends, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.security.api_key import APIKeyHeader
@@ -93,16 +93,30 @@ async def generate_my_api_key(username: str):
 
 async def verify_my_api_key(api_key: str = Security(api_key_header)):
     if not api_key:
-        return JSONResponse({"ok": False, "error": "مفتاح الـ API Key مفقود!"}, status_code=401)
+        raise HTTPException(status_code=401, detail="API Key is missing!")
         
     users = load_json_fail_safe(USERS_FILE, {})
     for username, data in users.items():
-        if data.get("my_api_key") == api_key:
+        if isinstance(data, dict) and data.get("my_api_key") == api_key:
             return username
             
-    return JSONResponse({"ok": False, "error": "مفتاح الـ API Key غير صحيح أو منتهي الصلاحية"}, status_code=403)
+    raise HTTPException(status_code=403, detail="Invalid or expired API Key")
 
-# --- بقية دوال النظام وتعديل الـ JSON ليعمل تبادلياً ---
+# --- مسار المحادثة المحمي بالـ API Key الجديد ---
+@app.post("/api/chat/ask")
+async def ask_ai(
+    message: str = Form(...), 
+    chat_id: str = Form(...),
+    username: str = Depends(verify_my_api_key)
+):
+    response = cloud_engine.generate_gemini_response(user_message=message)
+    return {
+        "ok": True, 
+        "response": response, 
+        "user": username
+    }
+
+# --- نظام حساب الاستهلاك والمميزات ---
 
 def ensure_usage_fields(record):
     changed = False
@@ -164,6 +178,8 @@ def extract_text_from_bytes(filename, data: bytes):
             return None
     except Exception as e:
         return f"⚠️ تعذرت قراءة الملف: {e}"
+
+# --- مسارات المصادقة والمستخدمين والـ VIP ---
 
 @app.post("/api/signup")
 async def signup(request: Request):
@@ -271,13 +287,3 @@ async def redeem_code(request: Request):
     if not isinstance(record, dict):
         record = {"password": record}
     ensure_usage_fields(record)
-    record["total_allowed_seconds"] = record.get("total_allowed_seconds", FREE_WINDOW_SECONDS) + matched.get("hours", 0) * 3600
-    users[username] = record
-    save_json_fail_safe(USERS_FILE, users)
-
-    return {"ok": True, "hours_added": matched.get("hours", 0)}
-
-@app.get("/api/chats/{username}")
-async def get_chats(username: str):
-    all_chats = load_json_fail_safe(CHATS_FILE, {})
-    user_chats = all_chats.get(username, {})
