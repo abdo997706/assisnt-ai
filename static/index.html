@@ -6,20 +6,55 @@
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<!-- زر تحميل التطبيق الاحترافي للأندرويد والكمبيوتر -->
+<!-- زر تحميل التطبيق الاحترافي المتوافق مع جميع الأنظمة والمتصفحات القديمة والحديثة -->
 <button id="pwa-install-btn" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: #8a2be2; color: white; border: none; padding: 12px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; gap: 8px;">
     📲 تحميل التطبيق
 </button>
 
 <script>
-// 1. تسجيل الـ Service Worker (إجباري للأندرويد لكي يظهر الزر)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('Service Worker Registered'))
-            .catch(err => console.log('Service Worker Failed', err));
+try {
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(reg) { console.log('Service Worker Registered'); })
+                .catch(function(err) { console.log('Service Worker Failed', err); });
+        });
+    }
+
+    var deferredPrompt;
+    var installBtn = document.getElementById('pwa-install-btn');
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+        if (e && e.preventDefault) { e.preventDefault(); }
+        deferredPrompt = e;
+        if (installBtn) { installBtn.style.display = 'flex'; }
     });
+
+    if (installBtn) {
+        installBtn.addEventListener('click', function() {
+            if (deferredPrompt && deferredPrompt.prompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function(choiceResult) {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User installed the app');
+                    }
+                    deferredPrompt = null;
+                    installBtn.style.display = 'none';
+                });
+            }
+        });
+    }
+
+    window.addEventListener('appinstalled', function() {
+        if (installBtn) { installBtn.style.display = 'none'; }
+        deferredPrompt = null;
+    });
+} catch (error) {
+    console.log('Old browser detected, standard web experience fallback active.', error);
 }
+</script>
+</body>
+</html>
 
 let deferredPrompt;
 const installBtn = document.getElementById('pwa-install-btn');
