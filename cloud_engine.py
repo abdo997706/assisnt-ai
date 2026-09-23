@@ -1,7 +1,7 @@
 import os
 import random
 import time
-import google.generativeai as genai
+from google import genai
 import requests
 
 def generate_gemini_response(user_message, chat_history=None, system_prompt=None, model="gemini-1.5-flash", image=None):
