@@ -13,9 +13,10 @@
             --box-bg: #f9f9fb;
             --border-color: #eaeaea;
             --message-bot-bg: #ffffff;
+            --sidebar-bg: #ffffff;
         }
 
-        /* --- الألوان الخاصة بالوضع الليلي --- */
+        /* --- الألوان الخاصة بالوضع الليلي الأسود --- */
         [data-theme="dark"] {
             --bg-color: #121212;
             --chat-bg: #1e1e1e;
@@ -23,6 +24,7 @@
             --box-bg: #181818;
             --border-color: #2c2c2c;
             --message-bot-bg: #2d2d2d;
+            --sidebar-bg: #1e1e1e;
         }
 
         body {
@@ -46,6 +48,7 @@
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
             overflow: hidden;
+            transition: background 0.3s;
         }
 
         /* --- الهيدر العلوي --- */
@@ -80,16 +83,17 @@
             cursor: pointer;
             margin-right: auto; /* يدفع الأيقونة لأقصى اليمين */
             color: #ffffff;
+            outline: none;
         }
 
         /* --- القائمة الجانبية (Settings Sidebar) --- */
         .sidebar {
             position: absolute;
             top: 0;
-            right: -280px; /* مخفية افتراضياً */
+            right: -280px; /* مخفية افتراضياً خارج الشاشة */
             width: 260px;
             height: 100%;
-            background-color: var(--chat-bg);
+            background-color: var(--sidebar-bg);
             border-left: 1px solid var(--border-color);
             box-shadow: -5px 0 15px rgba(0,0,0,0.05);
             z-index: 200;
@@ -102,7 +106,7 @@
         }
 
         .sidebar.open {
-            right: 0; /* تظهر عند إضافة كلاس open */
+            right: 0; /* تظهر عند الفتح */
         }
 
         .sidebar-header {
@@ -120,6 +124,7 @@
             font-size: 1.2rem;
             cursor: pointer;
             color: var(--text-color);
+            outline: none;
         }
 
         .setting-item {
@@ -137,20 +142,57 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .setting-btn:hover {
+            background-color: #0056b3;
         }
 
         .setting-btn.secondary {
             background-color: #6c757d;
         }
 
+        .setting-btn.secondary:hover {
+            background-color: #545b62;
+        }
+
         .key-display {
             background-color: var(--box-bg);
-            padding: 8px;
+            padding: 10px;
             border-radius: 5px;
             font-size: 0.8rem;
             word-break: break-all;
             border: 1px dashed var(--border-color);
             display: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* --- مؤشر حالة الـ API Key ومؤشر الإدخال الجديد (API Key Caret) --- */
+        .api-caret-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--box-bg);
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .caret-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: #6c757d; /* رمادي افتراضي (غير متصل) */
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .caret-indicator.active {
+            background-color: #28a745; /* أخضر (نشط وموثق) */
+            box-shadow: 0 0 8px #28a745;
         }
 
         /* --- صندوق الرسائل --- */
@@ -163,6 +205,7 @@
             gap: 15px;
             background-color: var(--box-bg);
             padding-bottom: 90px; 
+            transition: background-color 0.3s;
         }
 
         .message {
@@ -181,6 +224,7 @@
             border-bottom-right-radius: 4px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
             border: 1px solid var(--border-color);
+            transition: background-color 0.3s;
         }
 
         .message.user {
@@ -190,7 +234,7 @@
             border-bottom-left-radius: 4px;
         }
 
-        /* --- صندوق الكتابة الثابت بالأسفل --- */
+        /* --- صندوق الكتابة الثابت بالأسفل حاسماً لعدم الاختفاء --- */
         .input-container {
             position: absolute;
             bottom: 0;
@@ -204,6 +248,7 @@
             align-items: center;
             gap: 10px;
             z-index: 100;
+            transition: background-color 0.3s;
         }
 
         .input-container input {
@@ -215,6 +260,7 @@
             border-radius: 25px;
             font-size: 0.95rem;
             outline: none;
+            transition: border-color 0.2s, background-color 0.3s;
         }
 
         .input-container input:focus {
@@ -230,6 +276,11 @@
             font-size: 0.95rem;
             cursor: pointer;
             font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .input-container button:hover {
+            background-color: #0056b3;
         }
 
         #pwa-install-btn {
@@ -248,7 +299,7 @@
 <body>
 
     <div class="app-container">
-        <!-- الهيدر العلوي ومعه زر الإعدادات التفاعلي -->
+        <!-- الهيدر العلوي ومعه زر الإعدادات -->
         <div class="chat-header">
             <div class="bot-icon">🤖</div>
             <span>المساعد الذكي</span>
@@ -256,7 +307,7 @@
             <button class="settings-toggle" onclick="toggleSidebar()">⚙️</button>
         </div>
 
-        <!-- القائمة الجانبية (الإعدادات) المضافة حديثاً -->
+        <!-- القائمة الجانبية (الإعدادات والتعديلات الكاملة) -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <span>إعدادات التطبيق</span>
@@ -269,52 +320,13 @@
                 <button class="setting-btn secondary" id="theme-btn" onclick="toggleTheme()">التحويل للوضع الليلي 🌙</button>
             </div>
 
-            <!-- ميزة توليد وصنع الـ API Key الحقيقية -->
+            <!-- ميزة الـ API Key Caret وحالة الاتصال المضافة حديثاً -->
             <div class="setting-item">
-                <label>مفتاح الـ API الخارق:</label>
-                <button class="setting-btn" onclick="generateApiKey()">صنع API Key جديد 🔑</button>
-                <div class="key-display" id="key-display" onclick="copyKey()">اضغط هنا لنسخ المفتاح</div>
+                <label>حالة المفتاح الحالي:</label>
+                <div class="api-caret-container">
+                    <span class="caret-indicator" id="caret-dot"></span>
+                    <span id="caret-status-text">مفتاح غير نشط / مفقود</span>
+                </div>
             </div>
-        </div>
 
-        <!-- منطقة رسائل الشات الحية -->
-        <div class="chat-messages" id="chat-box">
-            <div class="message bot">
-                أهلاً بك! اكتب رسالتك بالأسفل لتبدأ التحدث مع المساعد الذكي.
-            </div>
-        </div>
-
-        <!-- صندوق الكتابة المثبت ستايله بالأسفل تماماً لمنع الاختفاء -->
-        <div class="input-container">
-            <input type="text" id="user-input" placeholder="اكتب رسالتك هنا..." onkeydown="if(event.key === 'Enter') sendMessage()">
-            <button onclick="sendMessage()">إرسال</button>
-        </div>
-    </div>
-
-    <script>
-        // المتغيرات البرمجية الأساسية المتصلة بسيرفر Railway الخاص بك
-        let ACTIVE_USER_API_KEY = "sk_assist_default_key"; 
-        const BASE_SERVER_URL = "https://railway.app";
-
-        // دالة فتح وإغلاق القائمة الجانبية
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-        }
-
-        // دالة تبديل الألوان (الأبيض والأسود)
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const themeBtn = document.getElementById('theme-btn');
-            
-            if (currentTheme === 'dark') {
-                document.documentElement.removeAttribute('data-theme');
-                themeBtn.innerText = "التحويل للوضع الليلي 🌙";
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeBtn.innerText = "التحويل للوضع الفاتح ☀️";
-            }
-        }
-
-        // دالة توليد API Key من السيرفر وعرضه للمستخدم
-        async function generateApiKey() {
-            const keyDisplay = document.getElementById('key-display');
+            <!-- ميزة توليد وصنع الـ API Key الحقيقية الموصولة بالسيرفر -->
