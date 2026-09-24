@@ -25,41 +25,35 @@
             --sidebar-bg: #1e1e1e;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            transition: background-color 0.3s, color 0.3s;
-        }
+       /* --- كود سحري لإخفاء الكلمات المشوهة والتائهة تماماً من الشاشة --- */
+body {
+    display: flex;
+    flex-direction: column;
+    visibility: hidden; /* إخفاء كل شيء تائه بالخلفية */
+}
 
-        .app-container {
-            width: 100%;
-            max-width: 600px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background: var(--chat-bg);
-            position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            overflow: hidden;
-        }
+/* إظهار حاوية التطبيق الحقيقية فقط ونظيفة تماماً */
+.app-container {
+    visibility: visible !important;
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 100vh;
+    margin: 0 auto;
+}
 
-        .chat-header {
-            background-color: #4a154b;
-            color: #ffffff;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            font-weight: bold;
-            font-size: 1.1rem;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            z-index: 101;
-        }
-
+/* --- تثبيت صندوق الكتابة بالأسفل حاسماً لعدم الاختفاء --- */
+.input-container {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: 600px !important;
+    background: #ffffff !important;
+    z-index: 9999 !important;
+    visibility: visible !important;
+}
         .chat-header .bot-icon {
             width: 35px;
             height: 35px;
